@@ -199,7 +199,6 @@ QUANTUM-SHIELD/                         # repository root
    ├─ .gitignore                        # ignore rules for secrets and artifacts
    ├─ LICENSE                           # MIT license copy
    ├─ README.md                         # project-level guide
-   ├─ .gitignore                        # ignore rules for secrets and artifacts
    ├─ manage.py                         # Django management entry point
    ├─ requirements.txt                  # pinned Python dependencies
    ├─ accounts/                         # custom user, roles, token API
