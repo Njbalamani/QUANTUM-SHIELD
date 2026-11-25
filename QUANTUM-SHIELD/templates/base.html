@@ -1,0 +1,52 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="QuantumShield post-quantum readiness platform">
+  <title>{% block title %}{{ platform.name }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script src="{% static 'js/app.js' %}" defer></script>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">QS</span>
+        <span>{{ platform.name }}</span>
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        {% for item in platform.navigation %}
+          {% if item.label == "Logout" %}
+            <form class="nav-form" method="post" action="{{ item.url }}">
+              {% csrf_token %}
+              <button class="nav-button" type="submit">{{ item.label }}</button>
+            </form>
+          {% else %}
+            <a href="{{ item.url }}">{{ item.label }}</a>
+          {% endif %}
+        {% endfor %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    {% if messages %}
+      <div class="alerts" aria-live="polite">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }}" data-alert>{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span>{{ platform.name }} &middot; {{ platform.tagline }}</span>
+      <span>Post-quantum readiness, measured.</span>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}{{ platform.name }} &mdash; Post-quantum readiness{% endblock %}
+
+{% block content %}
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="badge badge-accent">Post-quantum readiness</span>
+      <h1>Know your cryptography. Plan your migration.</h1>
+      <p class="hero-text">
+        QuantumShield brings cryptographic inventory, vulnerability scanning, post-quantum
+        experiments, and performance benchmarking into one clear operational picture.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="/login/">Sign in</a>
+        <a class="btn btn-ghost" href="/dashboard/">Open dashboard</a>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <h2>Built for the quantum transition</h2>
+      <ul class="feature-list">
+        <li>Track every cryptographic asset and its quantum risk</li>
+        <li>Scan source and configuration text for legacy algorithms</li>
+        <li>Benchmark enabled KEM and signature algorithms</li>
+        <li>Plan and measure migration progress across teams</li>
+      </ul>
+      <div class="status-line">
+        <span class="status-dot {% if platform.oqs_available %}status-ok{% else %}status-warn{% endif %}"></span>
+        {% if platform.oqs_available %}
+          OQS bindings available{% if platform.oqs_version %} &middot; {{ platform.oqs_version }}{% endif %}
+        {% else %}
+          OQS bindings unavailable &mdash; PQ operations are disabled
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2>One platform, six capabilities</h2>
+      <p>From discovery through migration, every workflow shares the same evidence base.</p>
+    </div>
+    <div class="grid grid-three">
+      <article class="card">
+        <h3>Inventory</h3>
+        <p>Maintain a searchable register of algorithms, keys, protocols, owners, and criticality.</p>
+      </article>
+      <article class="card">
+        <h3>PQ lab</h3>
+        <p>Run ephemeral key establishment and signature experiments using enabled OQS mechanisms.</p>
+      </article>
+      <article class="card">
+        <h3>Scanning</h3>
+        <p>Detect RSA, ECC, SHA-1, and other legacy primitives in text and configuration files.</p>
+      </article>
+      <article class="card">
+        <h3>Benchmarking</h3>
+        <p>Measure generation, encapsulation, signing, and verification timings with repeatable runs.</p>
+      </article>
+      <article class="card">
+        <h3>Migration</h3>
+        <p>Convert findings into tracked plans and tasks with visible completion progress.</p>
+      </article>
+      <article class="card">
+        <h3>Reports</h3>
+        <p>Export overview, inventory, and benchmark evidence for auditors and stakeholders.</p>
+      </article>
+    </div>
+  </section>
+{% endblock %}

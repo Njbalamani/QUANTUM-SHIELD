@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard &mdash; {{ platform.name }}{% endblock %}
+
+{% block content %}
+  <section class="page-heading">
+    <div>
+      <h1>Security dashboard</h1>
+      <p class="muted">Signed in as {{ request.user.username }} &middot; {{ request.user.role|default:"user" }}</p>
+    </div>
+    <span class="badge {% if oqs.oqs_available %}badge-success{% else %}badge-warning{% endif %}">
+      {% if oqs.oqs_available %}OQS online{% else %}OQS unavailable{% endif %}
+    </span>
+  </section>
+
+  <section class="grid grid-stats" aria-label="Summary counts">
+    <article class="card stat-card"><span class="stat-label">Organizations</span><strong>{{ counts.organizations }}</strong></article>
+    <article class="card stat-card"><span class="stat-label">Assets</span><strong>{{ counts.assets }}</strong></article>
+    <article class="card stat-card"><span class="stat-label">Vulnerable</span><strong class="text-danger">{{ counts.vulnerable_assets }}</strong></article>
+    <article class="card stat-card"><span class="stat-label">Critical</span><strong class="text-danger">{{ counts.critical_assets }}</strong></article>
+    <article class="card stat-card"><span class="stat-label">Active plans</span><strong>{{ counts.active_plans }}</strong></article>
+    <article class="card stat-card"><span class="stat-label">Scans</span><strong>{{ counts.scans }}</strong></article>
+    <article class="card stat-card"><span class="stat-label">Findings</span><strong>{{ counts.findings }}</strong></article>
+    <article class="card stat-card"><span class="stat-label">Benchmarks</span><strong>{{ counts.benchmark_runs }}</strong></article>
+    <article class="card stat-card"><span class="stat-label">Reports</span><strong>{{ counts.reports }}</strong></article>
+    <article class="card stat-card"><span class="stat-label">Open tasks</span><strong>{{ counts.pending_migration_tasks }}</strong></article>
+  </section>
+
+  <section class="grid grid-two dashboard-grid">
+    <article class="card">
+      <div class="card-heading"><h2>Recent assets at risk</h2><a class="link" href="/dashboard/">View all</a></div>
+      {% if recent_assets %}
+        <table class="table">
+          <thead><tr><th>Asset</th><th>Algorithm</th><th>Criticality</th><th>Risk</th></tr></thead>
+          <tbody>
+            {% for asset in recent_assets %}
+              <tr>
+                <td>{{ asset.name }}</td>
+                <td>{{ asset.algorithm }}</td>
+                <td><span class="badge badge-neutral">{{ asset.criticality }}</span></td>
+                <td>
+                  {% if asset.pq_risk %}
+                    <span class="badge badge-danger">Vulnerable</span>
+                  {% else %}
+                    <span class="badge badge-success">Ready</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="muted">No cryptographic assets recorded yet.</p>
+      {% endif %}
+    </article>
+
+    <div class="stack">
+      <article class="card">
+        <div class="card-heading"><h2>Migration progress</h2></div>
+        {% if migration_progress %}
+          <p class="progress-label">
+            {{ migration_progress.completed }} of {{ migration_progress.total }} tasks complete
+            <strong>{{ migration_progress.percent }}%</strong>
+          </p>
+          <div class="progress" role="progressbar" aria-valuenow="{{ migration_progress.percent }}" aria-valuemin="0" aria-valuemax="100">
+            <span class="progress-bar" style="width: {{ migration_progress.percent }}%"></span>
+          </div>
+        {% else %}
+          <p class="muted">Create a migration plan to start tracking progress.</p>
+        {% endif %}
+      </article>
+
+      <article class="card">
+        <div class="card-heading"><h2>OQS status</h2></div>
+        <dl class="detail-list">
+          <dt>Available</dt><dd>{{ oqs.oqs_available|yesno:"Yes,No" }}</dd>
+          <dt>Version</dt><dd>{{ oqs.oqs_version|default:"Unknown" }}</dd>
+          <dt>KEMs</dt><dd>{{ oqs.enabled_kems|length }}</dd>
+          <dt>Signatures</dt><dd>{{ oqs.enabled_signatures|length }}</dd>
+        </dl>
+        {% if oqs.warning %}<p class="muted">{{ oqs.warning }}</p>{% endif %}
+      </article>
+
+      {% if risk_by_algorithm %}
+        <article class="card">
+          <div class="card-heading"><h2>Risk by algorithm</h2></div>
+          <ul class="risk-list">
+            {% for row in risk_by_algorithm %}
+              <li><span>{{ row.algorithm }}</span><span class="badge badge-danger">{{ row.count }}</span></li>
+            {% endfor %}
+          </ul>
+        </article>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="grid grid-two dashboard-grid">
+    <article class="card">
+      <div class="card-heading"><h2>Quick scan</h2></div>
+      <form method="post" class="form">
+        {% csrf_token %}
+        {{ scan_form.as_p }}
+        <button class="btn btn-primary" type="submit" name="scan_submit" value="1">Run scan</button>
+      </form>
+    </article>
+
+    <article class="card">
+      <div class="card-heading"><h2>Quick benchmark</h2></div>
+      <form method="post" class="form">
+        {% csrf_token %}
+        {{ benchmark_form.as_p }}
+        <button class="btn btn-primary" type="submit" name="benchmark_submit" value="1">Run benchmark</button>
+      </form>
+    </article>
+  </section>
+
+  <section class="card">
+    <div class="card-heading"><h2>Recent activity</h2></div>
+    {% if recent_audits %}
+      <table class="table">
+        <thead><tr><th>Action</th><th>User</th><th>When</th></tr></thead>
+        <tbody>
+          {% for audit in recent_audits %}
+            <tr>
+              <td>{{ audit.action }}</td>
+              <td>{{ audit.username|default:"system" }}</td>
+              <td>{{ audit.created_at }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="muted">No activity recorded yet.</p>
+    {% endif %}
+  </section>
+{% endblock %}
